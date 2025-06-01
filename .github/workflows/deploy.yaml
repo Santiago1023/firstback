@@ -1,0 +1,50 @@
+name: Deploy .NET 9 App to AWS Elastic Beanstalk
+
+on:
+  push:
+    branches: [main]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  APPLICATION_NAME: HelloCloudApp
+  ENVIRONMENT_NAME: HelloCloudApp-env
+  REGION: us-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --no-restore
+
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal
+
+      - name: Publish app
+        run: dotnet publish -c Release -o publish
+
+      - name: Zip publish folder
+        run: zip -r app.zip ./publish
+
+      - name: Deploy to AWS Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ env.APPLICATION_NAME }}
+          environment_name: ${{ env.ENVIRONMENT_NAME }}
+          version_label: ${{ github.sha }}
+          region: ${{ env.REGION }}
+          deployment_package: app.zip
