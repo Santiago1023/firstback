@@ -35,8 +35,11 @@ jobs:
       - name: Publish app
         run: dotnet publish -c Release -o publish
 
-      - name: Zip publish folder
-        run: zip -r app.zip ./publish
+      # - name: Zip publish folder
+      #   run: zip -r app.zip ./publish
+      - name: Zip publish folder correctly
+        run: cd publish && zip -r ../app.zip .
+
 
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v20
