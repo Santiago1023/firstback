@@ -32,11 +32,13 @@ jobs:
       - name: Run tests
         run: dotnet test --no-build --verbosity normal
 
-      - name: Publish app
-        run: dotnet publish -c Release -o publish
-
+      # - name: Publish app
+      #   run: dotnet publish -c Release -o publish
       # - name: Zip publish folder
       #   run: zip -r app.zip ./publish
+      - name: Publish self-contained app
+        run: dotnet publish -c Release -o publish -r linux-x64 --self-contained true
+
       - name: Zip publish folder correctly
         run: cd publish && zip -r ../app.zip .
 
