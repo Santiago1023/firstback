@@ -37,7 +37,12 @@ jobs:
       # - name: Zip publish folder
       #   run: zip -r app.zip ./publish
       - name: Publish self-contained app
-        run: dotnet publish -c Release -o publish -r linux-x64 --self-contained true
+        run: dotnet publish ./BackendProject.csproj -c Release -o publish -r linux-x64 --self-contained true
+
+      - name: Inspect publish output
+        run: |
+          ls -lh publish
+          file publish/*
 
       - name: Zip publish folder correctly
         run: cd publish && zip -r ../app.zip .
